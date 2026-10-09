@@ -40,8 +40,8 @@ h1{margin:0;font-size:clamp(42px,7vw,66px);line-height:1.04}
 .result-dot{width:9px;height:9px;border-radius:50%;background:#777}
 .result-dot.ai{background:#111}
 .result-dot.real{background:#16845b}
-.confidence{margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:55px;font-weight:700;letter-spacing:-2px}
-.confidence span{font-size:27px}
+.confidence{margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;letter-spacing:-1.5px}
+.confidence span{font-size:20px}
 .result>.muted{margin:0}
 .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
 .score-grid div{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid #e5e5e5;border-radius:9px;background:#fff}
@@ -127,8 +127,8 @@ footer a{color:#444;text-decoration:none}
     <p class="confidence"><span id="confidence-value">0</span>%</p>
     <p class="muted">Confidence returned by the API</p>
     <div class="score-grid">
-      <div><span>AI score</span><strong id="ai-score">0%</strong></div>
-      <div><span>Real score</span><strong id="real-score">0%</strong></div>
+      <div><span>AI generated</span><strong id="ai-score">0%</strong></div>
+      <div><span>Real image</span><strong id="real-score">0%</strong></div>
     </div>
     <p class="disclaimer">This is a model prediction, not proof of an image's origin. Results may be wrong, especially on edited, compressed, or unfamiliar images.</p>
   </div>
