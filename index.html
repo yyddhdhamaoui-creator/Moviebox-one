@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Imager — AI Image Detector</title>
+<link rel="icon" type="image/png" href="https://imager.cc.cd/website_public_logo.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:light;--ink:#111;--muted:#6f6f6f;--line:#e8e8e8}
@@ -40,8 +41,19 @@ h1{margin:0;font-size:clamp(42px,7vw,66px);line-height:1.04}
 .result-dot{width:9px;height:9px;border-radius:50%;background:#777}
 .result-dot.ai{background:#111}
 .result-dot.real{background:#16845b}
-.confidence{margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;letter-spacing:-1.5px}
-.confidence span{font-size:20px}
+.confidence{margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;letter-spacing:-1.5px;line-height:1.1}
+.confidence span{font-size:inherit}
+.model-label{display:block;margin:12px 0 6px 2px;color:#666;font-size:12px}
+.model-picker{position:relative}
+.model-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #ddd;border-radius:9px;background:#fff;color:#111;font-size:14px;cursor:pointer;text-align:left}
+.model-toggle:focus-visible{outline:2px solid #111;outline-offset:1px}
+.chevron{display:inline-block;transition:transform .25s ease}
+.model-picker.open .chevron{transform:rotate(180deg)}
+.model-options{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;margin:0;padding:6px;list-style:none;background:#fff;border:1px solid #e5e5e5;border-radius:10px;box-shadow:0 14px 35px #00000026;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.model-picker.open .model-options{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.model-options li{padding:12px;border-radius:7px;font-size:14px;cursor:pointer;transition:background .15s}
+.model-options li:hover{background:#f4f4f4}
+.model-options li[aria-selected="true"]{font-weight:700}
 .result>.muted{margin:0}
 .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
 .score-grid div{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid #e5e5e5;border-radius:9px;background:#fff}
@@ -87,7 +99,7 @@ footer a{color:#444;text-decoration:none}
 
 <header class="topbar">
   <a class="brand" href="/">
-    <img src="website_public_logo.png" alt="Imager">
+    <img src="https://imager.cc.cd/website_public_logo.png" alt="Imager">
     Imager
   </a>
 </header>
@@ -107,6 +119,17 @@ footer a{color:#444;text-decoration:none}
     </div>
     <img id="preview" class="preview" style="display:none" alt="Preview">
     <p id="filename" class="filename" style="display:none"></p>
+    <span class="model-label">Model</span>
+    <div class="model-picker" id="model-picker">
+      <button type="button" id="model-toggle" class="model-toggle" aria-haspopup="listbox" aria-expanded="false">
+        <span id="model-current">imagers/imager-1</span>
+        <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <ul id="model-options" class="model-options" role="listbox">
+        <li role="option" data-value="imagers/imager-1" aria-selected="true">imagers/imager-1</li>
+        <li role="option" data-value="imagers/imager-1-tiny" aria-selected="false">imagers/imager-1-tiny</li>
+      </ul>
+    </div>
     <button id="analyze-btn" class="analyze-button" disabled>Analyze</button>
   </div>
 
@@ -144,7 +167,7 @@ footer a{color:#444;text-decoration:none}
 
     <div class="future-note">
       <h3>Coming soon</h3>
-      <p>We will soon launch imager-1-tiny and imager-2, which will be able to detect DALL·E 3 and other text-to-image models.</p>
+      <p>We will soon launch imager-1-ultra, similar to imager-2, which will be able to detect DALL·E 3 and other text-to-image models.</p>
     </div>
 
     <p class="model-meta">Model: <code>Imagers/Imager-1</code></p>
@@ -180,6 +203,34 @@ const realScore = document.getElementById('real-score');
 const limitError = document.getElementById('limit-error');
 
 let currentFile = null;
+let currentModel = 'imagers/imager-1';
+
+const modelPicker = document.getElementById('model-picker');
+const modelToggle = document.getElementById('model-toggle');
+const modelCurrent = document.getElementById('model-current');
+const modelOptions = document.querySelectorAll('#model-options li');
+
+modelToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = modelPicker.classList.toggle('open');
+  modelToggle.setAttribute('aria-expanded', open);
+});
+
+modelOptions.forEach((li) => {
+  li.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentModel = li.dataset.value;
+    modelCurrent.textContent = currentModel;
+    modelOptions.forEach((o) => o.setAttribute('aria-selected', o === li));
+    modelPicker.classList.remove('open');
+    modelToggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+document.addEventListener('click', () => {
+  modelPicker.classList.remove('open');
+  modelToggle.setAttribute('aria-expanded', 'false');
+});
 
 function getVisitorId() {
   let id = localStorage.getItem('imager_visitor_id');
@@ -228,13 +279,15 @@ analyzeBtn.addEventListener('click', async () => {
   limitError.style.display = 'none';
   resultEl.style.display = 'none';
   loading.style.display = 'block';
-  loadingText.textContent = 'Analyzing with Imager-1…';
+  const selectedModel = currentModel;
+  loadingText.textContent = 'Analyzing with ' + selectedModel + '…';
   progressBar.style.width = '30%';
 
   try {
     const formData = new FormData();
     formData.append('file', currentFile);
     formData.append('visitor_id', getVisitorId());
+    formData.append('model', selectedModel);
     progressBar.style.width = '60%';
 
     const response = await fetch(API, { method: 'POST', body: formData });
@@ -256,7 +309,8 @@ analyzeBtn.addEventListener('click', async () => {
 
     const data = await response.json();
     progressBar.style.width = '100%';
-    setTimeout(() => { loading.style.display = 'none'; progressBar.style.width = '0%'; }, 400);
+    loading.style.display = 'none';
+    progressBar.style.width = '0%';
 
     resultEl.style.display = 'block';
     resultDot.className = 'result-dot ' + (data.isAI ? 'ai' : 'real');
