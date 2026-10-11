@@ -93,7 +93,16 @@ footer a{color:#444;text-decoration:none}
   font-weight: 700;
   line-height: 1.5;
 }
+.try-pill{display:inline-flex;align-items:center;gap:9px;margin:0 0 26px;padding:7px 16px 7px 7px;border:1px solid #e3e3e3;border-radius:999px;background:#fff;color:#111;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.try-pill:hover{background:#f6f6f6;border-color:#bdbdbd;transform:translateY(-1px)}
+.try-pill .tag{background:#111;color:#fff;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.8px}
+.preview{cursor:pointer;border:1px solid var(--line)}
+.upload-card{background:#fff}
+.analyze-button{letter-spacing:.2px}
+.model-toggle:hover{border-color:#999}
+.quota-text{margin:8px 2px 0;color:#777;font-size:12px}
 </style>
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f7cb54549fb34f72953793133a753878"}'></script>
 </head>
 <body>
 
@@ -105,6 +114,11 @@ footer a{color:#444;text-decoration:none}
 </header>
 
 <main class="hero">
+  <a class="try-pill" id="try-pro" href="#">
+    <span class="tag">NEW</span>
+    Try Imager-1 Pro
+    <span aria-hidden="true">→</span>
+  </a>
   <p class="eyebrow">AI IMAGE DETECTION</p>
   <h1>Is this image real?</h1>
   <p class="subtitle">Detect AI-generated images with Imager-1.</p>
@@ -122,14 +136,16 @@ footer a{color:#444;text-decoration:none}
     <span class="model-label">Model</span>
     <div class="model-picker" id="model-picker">
       <button type="button" id="model-toggle" class="model-toggle" aria-haspopup="listbox" aria-expanded="false">
-        <span id="model-current">imagers/imager-1</span>
+        <span id="model-current">imager-1</span>
         <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <ul id="model-options" class="model-options" role="listbox">
-        <li role="option" data-value="imagers/imager-1" aria-selected="true">imagers/imager-1</li>
-        <li role="option" data-value="imagers/imager-1-tiny" aria-selected="false">imagers/imager-1-tiny</li>
+        <li role="option" data-value="imager-1-pro" aria-selected="false">imager-1-pro</li>
+        <li role="option" data-value="imager-1" aria-selected="true">imager-1</li>
+        <li role="option" data-value="imager-1-tiny" aria-selected="false">imager-1-tiny</li>
       </ul>
     </div>
+    <p id="quota-text" class="quota-text"></p>
     <button id="analyze-btn" class="analyze-button" disabled>Analyze</button>
   </div>
 
@@ -163,27 +179,34 @@ footer a{color:#444;text-decoration:none}
   <div class="about-inner">
     <p class="eyebrow">ABOUT</p>
     <h2>Built for developers.</h2>
-    <p>Imager-1 is the first model of the Imager family. It is a 50M parameter AI image detector trained to distinguish real photographs from AI-generated images.</p>
-
-    <div class="future-note">
-      <h3>Coming soon</h3>
-      <p>We will soon launch imager-1-ultra, similar to imager-2, which will be able to detect DALL·E 3 and other text-to-image models.</p>
-    </div>
+    <p>Imager is a family of AI image detectors trained to distinguish real photographs from AI-generated images. Three models are available:</p>
+    <p><strong>imager-1</strong> — 50M parameters, ConvNeXt-Small.</p>
+    <p><strong>imager-1-tiny</strong> — 25M parameters, ResNet-50.</p>
+    <p><strong>imager-1-pro</strong> — 89M parameters, ConvNeXt-Base, trained on Defactify (DALL·E 3, Midjourney v6, SDXL, SD3).</p>
+    <p>Free tier: 5 analyses/day with imager-1, 10 with imager-1-tiny, 3 with imager-1-pro.</p>
 
     <p class="model-meta">Model: <code>Imagers/Imager-1</code></p>
 
-    <a class="model-link" href="https://huggingface.co/Imagers/imager-1" target="_blank">View on Hugging Face →</a>
+    <a class="model-link" href="https://huggingface.co/Imagers/imager-1" target="_blank" rel="noopener noreferrer">View on Hugging Face →</a>
   </div>
 </section>
 
 <footer>
   <span>© Imager · AI image detection</span>
-  <a href="https://huggingface.co/Imagers/imager-1" target="_blank">Model on Hugging Face</a>
+  <a href="https://huggingface.co/Imagers/imager-1" target="_blank" rel="noopener noreferrer">Model on Hugging Face</a>
 </footer>
 
 <script>
-const API = 'https://validio-production.up.railway.app/predict';
-const DAILY_LIMIT = 10;
+const MODEL_ENDPOINTS = {
+  'imager-1': 'https://bbzbx.aminamaoui11.workers.dev/imager-1',
+  'imager-1-tiny': 'https://bbzbx.aminamaoui11.workers.dev/imager-1-tiny',
+  'imager-1-pro': 'https://bbzbx.aminamaoui11.workers.dev/imager-1-pro'
+};
+const MODEL_LIMITS = {
+  'imager-1': 5,
+  'imager-1-tiny': 10,
+  'imager-1-pro': 3
+};
 
 const fileInput = document.getElementById('file-input');
 const dropzone = document.getElementById('dropzone');
@@ -203,7 +226,37 @@ const realScore = document.getElementById('real-score');
 const limitError = document.getElementById('limit-error');
 
 let currentFile = null;
-let currentModel = 'imagers/imager-1';
+let currentModel = 'imager-1';
+
+const quotaText = document.getElementById('quota-text');
+
+function todayKey() {
+  return new Date().toLocaleDateString('en-CA');
+}
+
+function getUsage() {
+  try {
+    const u = JSON.parse(localStorage.getItem('imager_usage') || '{}');
+    if (u.date === todayKey() && u.counts) return u;
+  } catch (e) {}
+  return { date: todayKey(), counts: {} };
+}
+
+function saveUsage(u) {
+  try { localStorage.setItem('imager_usage', JSON.stringify(u)); } catch (e) {}
+}
+
+function remainingFor(model) {
+  const used = getUsage().counts[model] || 0;
+  return MODEL_LIMITS[model] - used;
+}
+
+function updateQuotaText() {
+  const left = remainingFor(currentModel);
+  quotaText.textContent = left > 0
+    ? `${left} of ${MODEL_LIMITS[currentModel]} analyses left today with ${currentModel}`
+    : `Daily limit reached for ${currentModel}. It resets tomorrow.`;
+}
 
 const modelPicker = document.getElementById('model-picker');
 const modelToggle = document.getElementById('model-toggle');
@@ -216,15 +269,27 @@ modelToggle.addEventListener('click', (e) => {
   modelToggle.setAttribute('aria-expanded', open);
 });
 
+function selectModel(value) {
+  currentModel = value;
+  modelCurrent.textContent = value;
+  modelOptions.forEach((o) => o.setAttribute('aria-selected', String(o.dataset.value === value)));
+  updateQuotaText();
+}
+
 modelOptions.forEach((li) => {
   li.addEventListener('click', (e) => {
     e.stopPropagation();
-    currentModel = li.dataset.value;
-    modelCurrent.textContent = currentModel;
-    modelOptions.forEach((o) => o.setAttribute('aria-selected', o === li));
+    selectModel(li.dataset.value);
     modelPicker.classList.remove('open');
     modelToggle.setAttribute('aria-expanded', 'false');
   });
+});
+
+const tryPro = document.getElementById('try-pro');
+tryPro.addEventListener('click', (e) => {
+  e.preventDefault();
+  selectModel('imager-1-pro');
+  document.querySelector('.upload-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
 document.addEventListener('click', () => {
@@ -242,6 +307,7 @@ function getVisitorId() {
 }
 
 dropzone.addEventListener('click', () => fileInput.click());
+preview.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.background = '#f0f0f0'; });
 dropzone.addEventListener('dragleave', () => { dropzone.style.background = ''; });
 dropzone.addEventListener('drop', (e) => {
@@ -274,6 +340,12 @@ function handleFile(file) {
 
 analyzeBtn.addEventListener('click', async () => {
   if (!currentFile) return;
+  if (remainingFor(currentModel) <= 0) {
+    updateQuotaText();
+    limitError.textContent = `Daily limit reached for ${currentModel}. It resets tomorrow.`;
+    limitError.style.display = 'block';
+    return;
+  }
   analyzeBtn.disabled = true;
   errorEl.style.display = 'none';
   limitError.style.display = 'none';
@@ -287,16 +359,15 @@ analyzeBtn.addEventListener('click', async () => {
     const formData = new FormData();
     formData.append('file', currentFile);
     formData.append('visitor_id', getVisitorId());
-    formData.append('model', selectedModel);
     progressBar.style.width = '60%';
 
-    const response = await fetch(API, { method: 'POST', body: formData });
+    const response = await fetch(MODEL_ENDPOINTS[selectedModel], { method: 'POST', body: formData });
     progressBar.style.width = '90%';
 
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}));
       loading.style.display = 'none';
-      limitError.textContent = data.detail || `Daily limit reached (${DAILY_LIMIT} analyses per day). Try again tomorrow.`;
+      limitError.textContent = data.detail || `Daily limit reached for ${selectedModel}. It resets tomorrow.`;
       limitError.style.display = 'block';
       analyzeBtn.disabled = false;
       return;
@@ -308,6 +379,10 @@ analyzeBtn.addEventListener('click', async () => {
     }
 
     const data = await response.json();
+    const usage = getUsage();
+    usage.counts[selectedModel] = (usage.counts[selectedModel] || 0) + 1;
+    saveUsage(usage);
+    updateQuotaText();
     progressBar.style.width = '100%';
     loading.style.display = 'none';
     progressBar.style.width = '0%';
@@ -327,6 +402,7 @@ analyzeBtn.addEventListener('click', async () => {
     analyzeBtn.disabled = false;
   }
 });
+updateQuotaText();
 </script>
 </body>
 </html>
