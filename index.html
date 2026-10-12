@@ -393,7 +393,7 @@ analyzeBtn.addEventListener('click', async () => {
     const formData = new FormData();
     formData.append('file', currentFile);
     formData.append('visitor_id', getVisitorId());
-    formData.append('model', selectedModel);
+    formData.append('model', 'Imagers/' + selectedModel);
     progress.style.width = '60%';
 
     const response = await fetch(API, { method: 'POST', body: formData });
