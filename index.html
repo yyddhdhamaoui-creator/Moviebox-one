@@ -2,140 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Imager — AI Image Detector</title>
+<meta name="description" content="Detect AI-generated images with the Imager family of models: imager-1, imager-1-tiny and imager-1-pro.">
 <link rel="icon" type="image/png" href="https://imager.cc.cd/website_public_logo.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:light;--ink:#111;--muted:#6f6f6f;--line:#e8e8e8}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:'DM Sans',sans-serif}button,input{font:inherit}
-.topbar{height:84px;display:flex;align-items:center;justify-content:flex-start;padding:0 7.5%;border-bottom:1px solid #f0f0f0}
-.brand{display:inline-flex;align-items:center;gap:12px;color:#111;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:700;letter-spacing:-1px}
-.brand img{width:42px;height:42px;object-fit:cover;border-radius:50%;background:#000}
-.hero{max-width:760px;margin:0 auto;padding:74px 24px 94px;text-align:center}
-.eyebrow{margin:0 0 17px;font-size:11px;font-weight:700;letter-spacing:2.4px;color:#777}
-h1,h2,h3{font-family:'Space Grotesk',sans-serif;letter-spacing:-1.6px}
-h1{margin:0;font-size:clamp(42px,7vw,66px);line-height:1.04}
-.subtitle{margin:17px 0 0;font-size:21px;font-weight:500}
-.intro{max-width:540px;margin:16px auto 35px;color:var(--muted);font-size:15px;line-height:1.75}
-.upload-card{text-align:left;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 14px 45px #0000000b}
-.hidden-input{display:none}
-.dropzone{width:100%;min-height:238px;border:1px dashed #cfcfcf;border-radius:12px;background:#fafafa;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;cursor:pointer;padding:18px;color:#111;transition:background .2s,border-color .2s}
-.dropzone:hover{background:#f4f4f4;border-color:#888}
-.dropzone strong{font-size:15px}
-.upload-icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid #ddd;border-radius:50%;font-size:24px}
-.muted{color:var(--muted);font-size:12px}
-.preview{display:block;max-width:100%;max-height:330px;object-fit:contain;border-radius:8px}
-.filename{margin:10px 4px 0;color:#666;font-size:12px;overflow-wrap:anywhere}
-.analyze-button{width:100%;margin-top:12px;border:0;border-radius:9px;padding:16px 20px;color:#fff;background:#080808;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .2s}
-.analyze-button:hover:not(:disabled){background:#333;transform:translateY(-1px)}
-.analyze-button:disabled{cursor:not-allowed;opacity:.42}
-.loading-block{padding:12px 3px 3px;text-align:center;font-size:13px}
-.loading-block small{display:block;margin-top:9px;color:#777;line-height:1.5}
-.progress-track{height:4px;border-radius:4px;background:#eee;overflow:hidden}
-.progress-track span{display:block;height:100%;background:#111;transition:width .2s}
-.error{margin:13px 3px 2px;color:#b42318;font-size:13px}
-.result{margin-top:17px;padding:22px;border-radius:12px;background:#f7f7f7;text-align:center}
-.result-heading{display:flex;align-items:center;justify-content:center;gap:9px}
-.result-heading h2{margin:0;font-size:20px;letter-spacing:-.5px}
-.result-dot{width:9px;height:9px;border-radius:50%;background:#777}
-.result-dot.ai{background:#111}
-.result-dot.real{background:#16845b}
-.confidence{margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;letter-spacing:-1.5px;line-height:1.1}
-.confidence span{font-size:inherit}
-.model-label{display:block;margin:12px 0 6px 2px;color:#666;font-size:12px}
-.model-picker{position:relative}
-.model-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #ddd;border-radius:9px;background:#fff;color:#111;font-size:14px;cursor:pointer;text-align:left}
-.model-toggle:focus-visible{outline:2px solid #111;outline-offset:1px}
-.chevron{display:inline-block;transition:transform .25s ease}
-.model-picker.open .chevron{transform:rotate(180deg)}
-.model-options{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;margin:0;padding:6px;list-style:none;background:#fff;border:1px solid #e5e5e5;border-radius:10px;box-shadow:0 14px 35px #00000026;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
-.model-picker.open .model-options{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.model-options li{padding:12px;border-radius:7px;font-size:14px;cursor:pointer;transition:background .15s}
-.model-options li:hover{background:#f4f4f4}
-.model-options li[aria-selected="true"]{font-weight:700}
-.result>.muted{margin:0}
-.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-.score-grid div{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid #e5e5e5;border-radius:9px;background:#fff}
-.score-grid span{color:#666;font-size:12px}
-.score-grid strong{font-size:19px}
-.disclaimer{margin:17px 0 0;color:#777;font-size:11px;line-height:1.6}
-.privacy-note{max-width:520px;margin:18px auto 0;color:#888;font-size:11px;line-height:1.6}
-.about{background:#f7f7f7;padding:82px 24px}
-.about-inner{max-width:720px;margin:0 auto}
-.about h2{margin:0 0 20px;font-size:clamp(34px,5vw,48px)}
-.about p:not(.eyebrow):not(.model-meta){color:#555;font-size:15px;line-height:1.85}
-.model-link{display:inline-flex;gap:12px;align-items:center;margin-top:9px;padding:13px 17px;border-radius:8px;background:#111;color:#fff;font-size:13px;font-weight:600;text-decoration:none}
-.model-link:hover{background:#333}
-.future-note{margin-top:36px;padding:24px;border:1px solid #e1e1e1;border-radius:12px;background:#fff}
-.future-note h3{margin:0;font-size:22px;letter-spacing:-.6px}
-.future-note p{margin-bottom:0}
-.model-meta{margin-top:24px;color:#777;font-size:12px}
-.model-meta code{color:#333}
-footer{display:flex;justify-content:space-between;gap:15px;padding:25px 7.5%;color:#888;font-size:11px}
-footer a{color:#444;text-decoration:none}
-@media(max-width:600px){.topbar{height:70px;padding:0 20px}.hero{padding:54px 17px 68px}.intro{font-size:14px}.upload-card{padding:9px}.dropzone{min-height:205px}.about{padding:60px 20px}footer{padding:22px 20px;flex-direction:column}}
-
-/* Polished result verdict: 30% larger */
-.result-heading h2 {
-  font-size: 1.3em;
-  line-height: 1.2;
-}
-
-/* Daily quota exhausted notice */
-.limit-error {
-  padding: 15px 16px;
-  border: 1px solid #f3b4b4;
-  border-radius: 10px;
-  background: #fff0f0;
-  color: #b42318;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-.try-pill{display:inline-flex;align-items:center;gap:9px;margin:0 0 26px;padding:7px 16px 7px 7px;border:1px solid #e3e3e3;border-radius:999px;background:#fff;color:#111;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
-.try-pill:hover{background:#f6f6f6;border-color:#bdbdbd;transform:translateY(-1px)}
-.try-pill .tag{background:#111;color:#fff;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.8px}
-.preview{cursor:pointer;border:1px solid var(--line)}
-.upload-card{background:#fff}
-.analyze-button{letter-spacing:.2px}
-.model-toggle:hover{border-color:#999}
-.quota-text{margin:8px 2px 0;color:#777;font-size:12px}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f7cb54549fb34f72953793133a753878"}'></script>
+<style>
+:root{--ink:#0b0b0b;--muted:#6b6b6b;--line:#e6e6e6;--soft:#f6f6f6;--ai:#d92d20;--real:#12a150}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;line-height:1.5;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding:0 20px}
+.wide{max-width:960px;margin:0 auto;padding:0 20px}
+header.top{display:flex;align-items:center;gap:10px;padding:18px 0}
+header.top img{width:30px;height:30px;border-radius:50%;object-fit:cover}
+header.top span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.3px}
+.hero{text-align:center;padding:28px 0 8px}
+.try-pill{display:inline-flex;align-items:center;gap:9px;margin:0 0 22px;padding:6px 16px 6px 6px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-size:13px;font-weight:600;text-decoration:none;transition:background .2s,border-color .2s,transform .2s}
+.try-pill:hover{background:var(--soft);border-color:#bdbdbd;transform:translateY(-1px)}
+.try-pill .tag{background:var(--ink);color:#fff;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.8px}
+.eyebrow{font-size:12px;letter-spacing:2.5px;font-weight:700;color:var(--muted);margin:0 0 12px;text-transform:uppercase}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(34px,8vw,48px);line-height:1.05;letter-spacing:-1.5px;margin:0 0 14px}
+.sub{color:var(--muted);margin:0 auto;max-width:420px;font-size:16px}
+.upload-card{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.05)}
+.dropzone{border:1.5px dashed #cfcfcf;border-radius:14px;min-height:200px;padding:34px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;background:var(--soft);transition:border-color .2s,background .2s}
+.dropzone:hover,.dropzone.drag{border-color:var(--ink);background:#f0f0f0}
+.dropzone .title{font-weight:700;font-size:20px;margin:0 0 6px}
+.dropzone .hint{color:var(--muted);font-size:15px;margin:0}
+.preview{display:none;cursor:pointer;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000}
+.preview.show{display:block}
+.preview img{display:block;width:100%;max-height:340px;object-fit:contain}
+.file-name{margin:10px 2px 0;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.field-label{display:block;margin:18px 2px 6px;color:var(--muted);font-size:12px;font-weight:500}
+.model-picker{position:relative}
+.model-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border:1px solid #dcdcdc;border-radius:12px;background:#fff;color:var(--ink);font:500 15px 'DM Sans',sans-serif;cursor:pointer;text-align:left;transition:border-color .2s}
+.model-toggle:hover{border-color:#999}
+.model-toggle:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chevron{transition:transform .25s ease;flex-shrink:0}
+.model-picker.open .chevron{transform:rotate(180deg)}
+.model-options{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;margin:0;padding:6px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.14);opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.model-picker.open .model-options{opacity:1;transform:none;pointer-events:auto}
+.model-options li{padding:12px;border-radius:8px;font-size:15px;cursor:pointer;transition:background .15s}
+.model-options li:hover{background:var(--soft)}
+.model-options li[aria-selected="true"]{font-weight:700}
+.quota-text{margin:8px 2px 0;color:var(--muted);font-size:12px}
+.analyze-button{width:100%;margin-top:18px;padding:16px;border:0;border-radius:12px;background:var(--ink);color:#fff;font:700 16px 'DM Sans',sans-serif;cursor:pointer;transition:opacity .2s,transform .1s}
+.analyze-button:disabled{opacity:.35;cursor:not-allowed}
+.analyze-button:not(:disabled):active{transform:scale(.99)}
+.loading{display:none;margin-top:18px;text-align:center}
+.loading.show{display:block}
+.bar{height:6px;background:#eee;border-radius:99px;overflow:hidden}
+.bar > i{display:block;height:100%;width:0%;background:var(--ink);transition:width .4s ease}
+.loading p{color:var(--muted);font-size:13px;margin:10px 0 0}
+.error{display:none;margin-top:16px;color:#b42318;text-align:center;font-size:14px;padding:12px;border-radius:12px;background:#fef3f2}
+.error.show{display:block}
+.result{display:none;margin-top:20px;padding:22px;border-radius:16px;background:var(--soft);text-align:center}
+.result.show{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.verdict{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0}
+.verdict.ai{color:var(--ai)}
+.verdict.real{color:var(--real)}
+.confidence{margin:10px 0 0;font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;letter-spacing:-1.5px;line-height:1.1}
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.score{background:#fff;border-radius:12px;padding:12px;border:1px solid var(--line)}
+.score small{display:block;color:var(--muted);font-size:12px}
+.score b{font-family:'Space Grotesk',sans-serif;font-size:20px}
+.note{text-align:center;color:var(--muted);font-size:12px;margin:18px 0 0}
+.about{margin-top:64px;padding:52px 0;background:var(--soft)}
+.about h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,6vw,38px);letter-spacing:-1px;margin:0 0 10px}
+.about .lead{color:var(--muted);margin:0 0 28px;max-width:620px}
+.models{display:grid;gap:14px}
+.model-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;transition:transform .2s,box-shadow .2s}
+.model-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.07)}
+.model-card header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.model-card h3{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0;word-break:break-all}
+.badge{font-size:12px;font-weight:700;background:var(--ink);color:#fff;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 0;padding:0;list-style:none}
+.specs li{font-size:13px;color:var(--muted)}
+.specs b{display:block;color:var(--ink);font-size:15px;font-weight:700}
+.model-card p{margin:16px 0 0;font-size:14px;color:#333}
+.model-card a{display:inline-block;margin-top:16px;font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.limits{margin:20px 0 0;padding:14px 16px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px}
+footer{padding:28px 0;text-align:center;color:var(--muted);font-size:13px}
+footer a{color:var(--ink)}
+@media(min-width:720px){.models{grid-template-columns:repeat(3,1fr)}}
+</style>
 </head>
 <body>
 
-<header class="topbar">
-  <a class="brand" href="/">
-    <img src="https://imager.cc.cd/website_public_logo.png" alt="Imager">
-    Imager
-  </a>
-</header>
+<div class="wrap">
+  <header class="top">
+    <img src="https://imager.cc.cd/website_public_logo.png" alt="Imager logo">
+    <span>Imager</span>
+  </header>
 
-<main class="hero">
-  <a class="try-pill" id="try-pro" href="#">
-    <span class="tag">NEW</span>
-    Try Imager-1 Pro
-    <span aria-hidden="true">→</span>
-  </a>
-  <p class="eyebrow">AI IMAGE DETECTION</p>
-  <h1>Is this image real?</h1>
-  <p class="subtitle">Detect AI-generated images with Imager-1.</p>
-  <p class="intro">Upload an image and our model will analyze it to determine whether it was generated by artificial intelligence or captured by a real camera.</p>
+  <section class="hero">
+    <a class="try-pill" id="try-pro" href="#"><span class="tag">NEW</span>Try Imager-1 Pro <span aria-hidden="true">→</span></a>
+    <p class="eyebrow">AI image detection</p>
+    <h1>Is it real, or AI?</h1>
+    <p class="sub">Upload an image and Imager tells you whether it was generated by AI.</p>
+  </section>
 
-  <div class="upload-card">
-    <input type="file" id="file-input" class="hidden-input" accept="image/*">
-    <div class="dropzone" id="dropzone">
-      <div class="upload-icon">↑</div>
-      <strong>Click to upload an image</strong>
-      <span class="muted">PNG, JPG, WEBP · max 10 MB</span>
+  <section class="upload-card" aria-label="Analyze an image">
+    <div class="dropzone" id="dropzone" role="button" tabindex="0">
+      <p class="title">Click to upload an image</p>
+      <p class="hint">PNG, JPG, WEBP · max 10 MB</p>
     </div>
-    <img id="preview" class="preview" style="display:none" alt="Preview">
-    <p id="filename" class="filename" style="display:none"></p>
-    <span class="model-label">Model</span>
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+
+    <div class="preview" id="preview"><img id="previewImg" alt="Selected image"></div>
+    <p class="file-name" id="fileName"></p>
+
+    <span class="field-label" id="model-label">Model</span>
     <div class="model-picker" id="model-picker">
-      <button type="button" id="model-toggle" class="model-toggle" aria-haspopup="listbox" aria-expanded="false">
+      <button type="button" id="model-toggle" class="model-toggle" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="model-label">
         <span id="model-current">imager-1</span>
         <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -145,90 +128,124 @@ footer a{color:#444;text-decoration:none}
         <li role="option" data-value="imager-1-tiny" aria-selected="false">imager-1-tiny</li>
       </ul>
     </div>
-    <p id="quota-text" class="quota-text"></p>
+    <p class="quota-text" id="quota-text"></p>
+
     <button id="analyze-btn" class="analyze-button" disabled>Analyze</button>
-  </div>
 
-  <p class="privacy-note">Your image is sent to our API for analysis and is not stored.</p>
-
-  <div id="loading" class="loading-block" style="display:none">
-    <div class="progress-track"><span id="progress-bar" style="width:0%"></span></div>
-    <small id="loading-text">Analyzing…</small>
-  </div>
-
-  <p id="error" class="error" style="display:none"></p>
-
-  <div id="result" class="result" style="display:none">
-    <div class="result-heading">
-      <span class="result-dot" id="result-dot"></span>
-      <h2 id="result-label">—</h2>
+    <div class="loading" id="loading">
+      <div class="bar"><i id="progress"></i></div>
+      <p id="loadingText">Analyzing…</p>
     </div>
-    <p class="confidence"><span id="confidence-value">0</span>%</p>
-    <p class="muted">Confidence returned by the API</p>
-    <div class="score-grid">
-      <div><span>AI generated</span><strong id="ai-score">0%</strong></div>
-      <div><span>Real image</span><strong id="real-score">0%</strong></div>
-    </div>
-    <p class="disclaimer">This is a model prediction, not proof of an image's origin. Results may be wrong, especially on edited, compressed, or unfamiliar images.</p>
-  </div>
 
-  <div id="limit-error" class="limit-error" style="display:none;margin-top:13px"></div>
-</main>
+    <div class="error" id="limit-error"></div>
+
+    <div class="result" id="result">
+      <p class="verdict" id="verdict"></p>
+      <div class="confidence"><span id="confidence-value">0.00</span>%</div>
+      <div class="scores">
+        <div class="score"><small>AI score</small><b id="ai-score">0.00%</b></div>
+        <div class="score"><small>Real score</small><b id="real-score">0.00%</b></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Your image is sent to our API for analysis and is not stored.</p>
+</div>
 
 <section class="about">
-  <div class="about-inner">
-    <p class="eyebrow">ABOUT</p>
+  <div class="wide">
+    <p class="eyebrow">About</p>
     <h2>Built for developers.</h2>
-    <p>Imager is a family of AI image detectors trained to distinguish real photographs from AI-generated images. Three models are available:</p>
-    <p><strong>imager-1</strong> — 50M parameters, ConvNeXt-Small.</p>
-    <p><strong>imager-1-tiny</strong> — 25M parameters, ResNet-50.</p>
-    <p><strong>imager-1-pro</strong> — 89M parameters, ConvNeXt-Base, trained on Defactify (DALL·E 3, Midjourney v6, SDXL, SD3).</p>
-    <p>Free tier: 5 analyses/day with imager-1, 10 with imager-1-tiny, 3 with imager-1-pro.</p>
+    <p class="lead">Imager is a family of AI image detectors trained to tell real photographs from AI-generated ones. Pick the model that fits your needs.</p>
 
-    <p class="model-meta">Model: <code>Imagers/Imager-1</code></p>
+    <div class="models">
+      <article class="model-card">
+        <header>
+          <h3>imager-1</h3>
+          <span class="badge">Default</span>
+        </header>
+        <ul class="specs">
+          <li>Parameters<b>50M</b></li>
+          <li>Architecture<b>ConvNeXt-Small</b></li>
+        </ul>
+        <p>The balanced model for everyday checks.</p>
+        <a href="https://huggingface.co/Imagers/imager-1" target="_blank" rel="noopener noreferrer">View on Hugging Face →</a>
+      </article>
 
-    <a class="model-link" href="https://huggingface.co/Imagers/imager-1" target="_blank" rel="noopener noreferrer">View on Hugging Face →</a>
+      <article class="model-card">
+        <header>
+          <h3>imager-1-tiny</h3>
+          <span class="badge">Lightweight</span>
+        </header>
+        <ul class="specs">
+          <li>Parameters<b>25M</b></li>
+          <li>Architecture<b>ResNet-50</b></li>
+        </ul>
+        <p>The smallest model, built for quick results and high volume.</p>
+        <a href="https://huggingface.co/Imagers/imager-1-tiny" target="_blank" rel="noopener noreferrer">View on Hugging Face →</a>
+      </article>
+
+      <article class="model-card">
+        <header>
+          <h3>imager-1-pro</h3>
+          <span class="badge">Largest</span>
+        </header>
+        <ul class="specs">
+          <li>Parameters<b>89M</b></li>
+          <li>Architecture<b>ConvNeXt-Base</b></li>
+        </ul>
+        <p>Trained on Defactify images from DALL·E 3, Midjourney v6, SDXL and SD3.</p>
+        <a href="https://huggingface.co/Imagers/imager-1-pro" target="_blank" rel="noopener noreferrer">View on Hugging Face →</a>
+      </article>
+    </div>
+
+    <p class="limits">Free tier: 5 analyses/day with imager-1, 10 with imager-1-tiny, 3 with imager-1-pro.</p>
   </div>
 </section>
 
 <footer>
-  <span>© Imager · AI image detection</span>
-  <a href="https://huggingface.co/Imagers/imager-1" target="_blank" rel="noopener noreferrer">Model on Hugging Face</a>
+  <p>© Imager · <a href="https://huggingface.co/Imagers" target="_blank" rel="noopener noreferrer">Models on Hugging Face</a></p>
 </footer>
 
 <script>
-const MODEL_ENDPOINTS = {
-  'imager-1': 'https://bbzbx.aminamaoui11.workers.dev/imager-1',
-  'imager-1-tiny': 'https://bbzbx.aminamaoui11.workers.dev/imager-1-tiny',
-  'imager-1-pro': 'https://bbzbx.aminamaoui11.workers.dev/imager-1-pro'
-};
+const API = 'https://validio-production.up.railway.app/predict';
 const MODEL_LIMITS = {
   'imager-1': 5,
   'imager-1-tiny': 10,
   'imager-1-pro': 3
 };
 
-const fileInput = document.getElementById('file-input');
-const dropzone = document.getElementById('dropzone');
-const preview = document.getElementById('preview');
-const filenameEl = document.getElementById('filename');
-const analyzeBtn = document.getElementById('analyze-btn');
-const loading = document.getElementById('loading');
-const loadingText = document.getElementById('loading-text');
-const progressBar = document.getElementById('progress-bar');
-const errorEl = document.getElementById('error');
-const resultEl = document.getElementById('result');
-const resultDot = document.getElementById('result-dot');
-const resultLabel = document.getElementById('result-label');
-const confidenceValue = document.getElementById('confidence-value');
-const aiScore = document.getElementById('ai-score');
-const realScore = document.getElementById('real-score');
-const limitError = document.getElementById('limit-error');
-
-let currentFile = null;
 let currentModel = 'imager-1';
+let currentFile = null;
+let previewUrl = null;
 
-const quotaText = document.getElementById('quota-text');
+const $ = (id) => document.getElementById(id);
+const dropzone = $('dropzone');
+const fileInput = $('fileInput');
+const preview = $('preview');
+const previewImg = $('previewImg');
+const fileName = $('fileName');
+const analyzeBtn = $('analyze-btn');
+const loading = $('loading');
+const progress = $('progress');
+const loadingText = $('loadingText');
+const limitError = $('limit-error');
+const result = $('result');
+const quotaText = $('quota-text');
+const modelPicker = $('model-picker');
+const modelToggle = $('model-toggle');
+const modelCurrent = $('model-current');
+const modelOptions = document.querySelectorAll('#model-options li');
+
+function getVisitorId() {
+  let id = null;
+  try { id = localStorage.getItem('imager_visitor_id'); } catch (e) {}
+  if (!id) {
+    id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { localStorage.setItem('imager_visitor_id', id); } catch (e) {}
+  }
+  return id;
+}
 
 function todayKey() {
   return new Date().toLocaleDateString('en-CA');
@@ -258,16 +275,54 @@ function updateQuotaText() {
     : `Daily limit reached for ${currentModel}. It resets tomorrow.`;
 }
 
-const modelPicker = document.getElementById('model-picker');
-const modelToggle = document.getElementById('model-toggle');
-const modelCurrent = document.getElementById('model-current');
-const modelOptions = document.querySelectorAll('#model-options li');
+function showError(msg) {
+  limitError.textContent = msg;
+  limitError.classList.add('show');
+}
 
-modelToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  const open = modelPicker.classList.toggle('open');
-  modelToggle.setAttribute('aria-expanded', open);
+function clearError() {
+  limitError.textContent = '';
+  limitError.classList.remove('show');
+}
+
+function handleFile(file) {
+  if (!file) return;
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+    showError('Please upload a PNG, JPG or WEBP image.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showError('The image must be 10 MB or smaller.');
+    return;
+  }
+  clearError();
+  result.classList.remove('show');
+  currentFile = file;
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = URL.createObjectURL(file);
+  previewImg.src = previewUrl;
+  preview.classList.add('show');
+  dropzone.style.display = 'none';
+  fileName.textContent = file.name;
+  analyzeBtn.disabled = false;
+}
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    fileInput.click();
+  }
 });
+preview.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+['dragenter', 'dragover'].forEach((ev) =>
+  dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add('drag'); })
+);
+['dragleave', 'drop'].forEach((ev) =>
+  dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove('drag'); })
+);
+dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
 
 function selectModel(value) {
   currentModel = value;
@@ -275,6 +330,12 @@ function selectModel(value) {
   modelOptions.forEach((o) => o.setAttribute('aria-selected', String(o.dataset.value === value)));
   updateQuotaText();
 }
+
+modelToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = modelPicker.classList.toggle('open');
+  modelToggle.setAttribute('aria-expanded', String(open));
+});
 
 modelOptions.forEach((li) => {
   li.addEventListener('click', (e) => {
@@ -285,97 +346,67 @@ modelOptions.forEach((li) => {
   });
 });
 
-const tryPro = document.getElementById('try-pro');
-tryPro.addEventListener('click', (e) => {
-  e.preventDefault();
-  selectModel('imager-1-pro');
-  document.querySelector('.upload-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-
 document.addEventListener('click', () => {
   modelPicker.classList.remove('open');
   modelToggle.setAttribute('aria-expanded', 'false');
 });
 
-function getVisitorId() {
-  let id = localStorage.getItem('imager_visitor_id');
-  if (!id) {
-    id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem('imager_visitor_id', id);
-  }
-  return id;
-}
-
-dropzone.addEventListener('click', () => fileInput.click());
-preview.addEventListener('click', () => fileInput.click());
-dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.background = '#f0f0f0'; });
-dropzone.addEventListener('dragleave', () => { dropzone.style.background = ''; });
-dropzone.addEventListener('drop', (e) => {
+$('try-pro').addEventListener('click', (e) => {
   e.preventDefault();
-  dropzone.style.background = '';
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
+  selectModel('imager-1-pro');
+  document.querySelector('.upload-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
-function handleFile(file) {
-  if (!file.type.startsWith('image/')) return alert('Please upload an image.');
-  if (file.size > 10 * 1024 * 1024) return alert('Max size: 10 MB.');
-  currentFile = file;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    preview.src = e.target.result;
-    preview.style.display = 'block';
-    dropzone.style.display = 'none';
-    filenameEl.textContent = file.name;
-    filenameEl.style.display = 'block';
-    analyzeBtn.disabled = false;
-    resultEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    limitError.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+function renderResult(data) {
+  const ai = Number(data.aiScore ?? 0);
+  const real = Number(data.realScore ?? 0);
+  const isAI = data.isAI ?? ai > real;
+  const conf = Number(data.confidence ?? (isAI ? ai : real));
+
+  const verdict = $('verdict');
+  verdict.textContent = isAI ? 'AI-generated' : 'Real image';
+  verdict.className = 'verdict ' + (isAI ? 'ai' : 'real');
+  $('confidence-value').textContent = conf.toFixed(2);
+  $('ai-score').textContent = ai.toFixed(2) + '%';
+  $('real-score').textContent = real.toFixed(2) + '%';
+  result.classList.add('show');
 }
 
 analyzeBtn.addEventListener('click', async () => {
   if (!currentFile) return;
+  clearError();
+
   if (remainingFor(currentModel) <= 0) {
     updateQuotaText();
-    limitError.textContent = `Daily limit reached for ${currentModel}. It resets tomorrow.`;
-    limitError.style.display = 'block';
+    showError(`Daily limit reached for ${currentModel}. It resets tomorrow.`);
     return;
   }
-  analyzeBtn.disabled = true;
-  errorEl.style.display = 'none';
-  limitError.style.display = 'none';
-  resultEl.style.display = 'none';
-  loading.style.display = 'block';
+
   const selectedModel = currentModel;
+  analyzeBtn.disabled = true;
+  result.classList.remove('show');
+  loading.classList.add('show');
   loadingText.textContent = 'Analyzing with ' + selectedModel + '…';
-  progressBar.style.width = '30%';
+  progress.style.width = '30%';
 
   try {
     const formData = new FormData();
     formData.append('file', currentFile);
     formData.append('visitor_id', getVisitorId());
-    progressBar.style.width = '60%';
+    formData.append('model', selectedModel);
+    progress.style.width = '60%';
 
-    const response = await fetch(MODEL_ENDPOINTS[selectedModel], { method: 'POST', body: formData });
-    progressBar.style.width = '90%';
-
-    if (response.status === 429) {
-      const data = await response.json().catch(() => ({}));
-      loading.style.display = 'none';
-      limitError.textContent = data.detail || `Daily limit reached for ${selectedModel}. It resets tomorrow.`;
-      limitError.style.display = 'block';
-      analyzeBtn.disabled = false;
-      return;
-    }
+    const response = await fetch(API, { method: 'POST', body: formData });
+    progress.style.width = '90%';
 
     if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      throw new Error(data.detail || `API error (${response.status})`);
+      const err = await response.json().catch(() => ({}));
+      if (response.status === 429) {
+        showError(err.detail || `Daily limit reached for ${selectedModel}. Try again tomorrow.`);
+      } else {
+        showError('Error: ' + (err.error || err.detail || 'code ' + response.status));
+      }
+      return;
     }
 
     const data = await response.json();
@@ -383,25 +414,16 @@ analyzeBtn.addEventListener('click', async () => {
     usage.counts[selectedModel] = (usage.counts[selectedModel] || 0) + 1;
     saveUsage(usage);
     updateQuotaText();
-    progressBar.style.width = '100%';
-    loading.style.display = 'none';
-    progressBar.style.width = '0%';
-
-    resultEl.style.display = 'block';
-    resultDot.className = 'result-dot ' + (data.isAI ? 'ai' : 'real');
-    resultLabel.textContent = data.label;
-    confidenceValue.textContent = data.confidence;
-    aiScore.textContent = data.aiScore + '%';
-    realScore.textContent = data.realScore + '%';
-  } catch (e) {
-    loading.style.display = 'none';
-    progressBar.style.width = '0%';
-    errorEl.textContent = 'Error: ' + e.message;
-    errorEl.style.display = 'block';
+    renderResult(data);
+  } catch (err) {
+    showError('Could not reach the server. Please try again. (' + err.message + ')');
   } finally {
+    loading.classList.remove('show');
+    progress.style.width = '0%';
     analyzeBtn.disabled = false;
   }
 });
+
 updateQuotaText();
 </script>
 </body>
